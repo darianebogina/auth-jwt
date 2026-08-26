@@ -1,0 +1,21 @@
+.screen {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: var(--space-4);
+}
+
+.authedHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+    margin-bottom: var(--space-5);
+}
+
+.authedTitle {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 700;
+}
