@@ -1,18 +1,19 @@
 import {useState} from "react";
 import {Button} from "@/shared/ui";
-import {sessionModel} from "@/entities/session";
+import {useSession} from "@/entities/session";
 
 type LogoutButtonProps = {
     onLogout?: () => void;
 };
 
 export const LogoutButton = ({onLogout}: LogoutButtonProps) => {
+    const { logout } = useSession();
     const [isLoading, setIsLoading] = useState(false);
 
     const handleClick = async () => {
         setIsLoading(true);
         try {
-            await sessionModel.logout();
+            await logout();
         } finally {
             setIsLoading(false);
             onLogout?.();

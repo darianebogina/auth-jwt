@@ -11,13 +11,8 @@ body {
     min-height: 100vh;
     background: var(--color-bg);
     color: var(--color-text);
-    font-family: var(--font-sans);
 }
 
 #root {
     min-height: 100vh;
-}
-
-button {
-    font-family: inherit;
 }
