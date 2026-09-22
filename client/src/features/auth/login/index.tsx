@@ -1,7 +1,7 @@
 import {useState} from "react";
 import type {FormEvent} from "react";
 import {Button, TextField} from "@/shared/ui";
-import {sessionModel} from "@/entities/session";
+import {useSession} from "@/entities/session";
 import styles from "./styles.module.css";
 
 export type LoginFormValues = {
@@ -14,6 +14,7 @@ type LoginFormProps = {
 };
 
 export const LoginForm = ({onSubmit}: LoginFormProps) => {
+    const { login } = useSession();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -25,7 +26,7 @@ export const LoginForm = ({onSubmit}: LoginFormProps) => {
         setIsSubmitting(true);
 
         try {
-            const result = await sessionModel.login({ email, password });
+            const result = await login({ email, password });
             if (result.ok) {
                 onSubmit?.({ email, password });
             } else {
