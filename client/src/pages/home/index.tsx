@@ -5,7 +5,9 @@ import {Card} from "@/shared/ui";
 import styles from "./styles.module.css";
 
 export const HomePage = () => {
-    const session = useSession();
+    const { session, isInitialized } = useSession();
+
+    if (!isInitialized) return null;
 
     return (
         <main className={styles.screen}>

@@ -1,3 +1,3 @@
 export { UserBadge } from "./ui";
-export { useSession, sessionModel } from "./model";
-export type { Session } from "./model";
+export { SessionProvider, useSession } from "./session-context";
+export type { Session, LoginResult } from "./session-context";
