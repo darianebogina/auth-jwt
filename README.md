@@ -45,69 +45,6 @@ npm run dev
 Открой в браузере: **http://localhost:5173**
 
 Единственный аккаунт, под которым можно залогиниться, задаётся переменными `AUTH_EMAIL` / `AUTH_PASSWORD` в `.env`.
-
----
-
-## Как это работает
-
-1. **Логин** (`POST /api/auth/login`) — сервер проверяет email/пароль, выдаёт `accessToken` в теле ответа и кладёт `refreshToken` в httpOnly-cookie (`refresh_token`, путь `/api/auth`).
-2. **Access-токен** живёт только в памяти клиента (в сторе `sessionModel`) — при обновлении страницы он теряется.
-3. **Инициализация сессии** (`sessionModel.init`, вызывается один раз в `App.tsx`) — при старте приложения клиент дергает `POST /api/auth/refresh`: если refresh-cookie валидна, сессия восстанавливается без повторного ввода пароля.
-4. **Автоматический рефреш** — axios response-интерцептор (`shared/api/index.ts`) ловит `401`, один раз рефрешит токен через `/api/auth/refresh` (параллельные 401 переиспользуют один и тот же промис рефреша) и повторяет исходный запрос. Если рефреш не помог — сессия сбрасывается.
-5. **Логаут** (`POST /api/auth/logout`) — сервер чистит refresh-cookie, клиент чистит стор сессии.
-
----
-
-## API Reference
-
-### POST /api/auth/login
-
-```json
-// Тело запроса
-{ "email": "you@example.com", "password": "change-me" }
-
-// Успех — 200
-{ "accessToken": "<jwt>", "email": "you@example.com" }
-
-// Неверные данные — 401
-{ "error": "Invalid email or password" }
-```
-
-### POST /api/auth/refresh
-
-Читает `refresh_token` из cookie, ничего не принимает в теле.
-
-```json
-// Успех — 200
-{ "accessToken": "<jwt>", "email": "you@example.com" }
-
-// Cookie нет / просрочена — 401
-{ "error": "Not authenticated" }
-// или
-{ "error": "Session expired" }
-```
-
-### POST /api/auth/logout
-
-```json
-// 200, всегда
-{ "ok": true }
-```
-
-### GET /api/me
-
-```
-Authorization: Bearer <accessToken>
-```
-
-```json
-// Успех — 200
-{ "email": "you@example.com" }
-
-// Токена нет / невалиден — 401
-{ "error": "Invalid token" }
-```
-
 ---
 
 ## Токены
@@ -118,28 +55,3 @@ Authorization: Bearer <accessToken>
 | Refresh | 30 дней  | httpOnly-cookie `refresh_token`, путь `/api/auth` |
 
 Секреты (`ACCESS_TOKEN_SECRET`, `REFRESH_TOKEN_SECRET`) генерируются командой `openssl rand -base64 32` и задаются в `.env` (см. `.env.example`).
-
----
-
-## Проверка API прямо из консоли браузера
-
-```ts
-// Логин
-fetch('http://localhost:3000/api/auth/login', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  credentials: 'include',
-  body: JSON.stringify({ email: 'you@example.com', password: 'change-me' }),
-}).then(r => r.json()).then(console.log)
-
-// Рефреш (использует refresh-cookie)
-fetch('http://localhost:3000/api/auth/refresh', {
-  method: 'POST',
-  credentials: 'include',
-}).then(r => r.json()).then(console.log)
-
-// Проверка access-токена
-fetch('http://localhost:3000/api/me', {
-  headers: { Authorization: `Bearer ${accessToken}` },
-}).then(r => r.json()).then(console.log)
-```
